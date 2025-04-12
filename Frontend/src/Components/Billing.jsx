@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import Lottie from "lottie-react";
@@ -89,11 +88,16 @@ const Billing = () => {
 
     const handleGenerateQRCode = async () => {
         try {
+            if (cart.length === 0 && spclCart.length === 0) {
+                alert("Your cart is empty. Add items to generate a QR code.");
+                return;
+            }
+
             setShowQRCode(true);
             const response = await fetch("http://localhost:5000/api/decreaseCount", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cart }), // ✅ This correctly sends an array
+                body: JSON.stringify({ cart: [...cart, ...spclCart] }), // Combine both carts
             });
 
             const data = await response.json();
@@ -254,7 +258,7 @@ const Billing = () => {
                     )}
 
                     {/* QR Code Display */}
-                    {showQRCode && cart.length > 0 && (
+                    {showQRCode && (cart.length > 0 || spclCart.length > 0) && (
                         <div className="p-1 bg-white rounded-lg">
                             <QRCodeCanvas
                                 value={JSON.stringify(
